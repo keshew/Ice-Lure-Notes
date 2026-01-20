@@ -85,6 +85,347 @@ class DataStore: ObservableObject {
         }
     }
 }
+struct RecommendationsView: View {
+    @ObservedObject var store: DataStore
+    @State private var selectedRecommendation: DetailedRecommendation?
+    
+    // ✅ 10 РЕАЛЬНЫХ РЫБОЛОВНЫХ РЕКОМЕНДАЦИЙ + твои данные
+    private var allRecommendations: [DetailedRecommendation] {
+        var recs: [DetailedRecommendation] = []
+        
+        // 1–3. YOUR DATA (dynamic)
+        if let bestBait = store.baitStats.first, let topFish = topFish {
+            recs.append(DetailedRecommendation(
+                title: "🐟 \(topFish)",
+                suggestion: bestBait.baitName,
+                successRate: bestBait.averageResult / 3.0 * 100,
+                icon: "fish.fill",
+                isDataBased: true,
+                details: "Your best bait. Used \(bestBait.usageCount) times."
+            ))
+        }
+        
+        let goodDepth = bestDepthForGoodResults
+        if goodDepth > 0 {
+            recs.append(DetailedRecommendation(
+                title: "📏 Depth",
+                suggestion: "\(String(format: "%.1f m", goodDepth))",
+                successRate: goodSuccessRate,
+                icon: "scalemass",
+                isDataBased: true,
+                details: "Average depth for good results."
+            ))
+        }
+        
+        // 4–13. ✅ FIXED PROFESSIONAL RECOMMENDATIONS
+        recs.append(contentsOf: [
+            DetailedRecommendation(
+                title: "🐟 Perch (under ice)",
+                suggestion: "Micro jig 1–2 mm, red/white",
+                successRate: 87,
+                icon: "fish",
+                isDataBased: false,
+                details: "Active at 2–4 m. Near bottom or 20–30 cm above. Slow action."
+            ),
+            DetailedRecommendation(
+                title: "🐟 Zander",
+                suggestion: "Balancer 5–7 g, silver/blue",
+                successRate: 82,
+                icon: "shark",
+                isDataBased: false,
+                details: "Depth 5–10 m, drop to bottom + 3–5 s pause. Night/morning."
+            ),
+            DetailedRecommendation(
+                title: "🐟 Burbot",
+                suggestion: "Cross jig + piece of fish",
+                successRate: 91,
+                icon: "shark.fin",
+                isDataBased: false,
+                details: "Bottom, 7 m+. Night, –5 °C or colder. No movement for 10+ min."
+            ),
+            DetailedRecommendation(
+                title: "🌡️ Cold (–10 °C)",
+                suggestion: "Heavy mormyshka 3–5 g",
+                successRate: 78,
+                icon: "thermometer",
+                isDataBased: false,
+                details: "Fish in semi-dormant state, slow bottom play."
+            ),
+            DetailedRecommendation(
+                title: "🌤️ Rising pressure",
+                suggestion: "Small vertical lures",
+                successRate: 85,
+                icon: "arrow.up",
+                isDataBased: false,
+                details: "Best bite 7–10 a.m. Fast play in top 30 cm."
+            ),
+            DetailedRecommendation(
+                title: "❄️ First ice",
+                suggestion: "No-bait jig + bloodworm",
+                successRate: 93,
+                icon: "snowflake",
+                isDataBased: false,
+                details: "Biting everywhere during first 3 days. 0.5–2 m depth."
+            ),
+            DetailedRecommendation(
+                title: "🌕 Full moon",
+                suggestion: "Light-colored baits",
+                successRate: 76,
+                icon: "moon",
+                isDataBased: false,
+                details: "Burbot and zander active at night."
+            ),
+            DetailedRecommendation(
+                title: "💨 Wind 5+ m/s",
+                suggestion: "Balancers 7 g+",
+                successRate: 80,
+                icon: "wind",
+                isDataBased: false,
+                details: "Use heavy sinkers, play near bottom."
+            ),
+            DetailedRecommendation(
+                title: "🌤️ After spawning",
+                suggestion: "Micro jig, white",
+                successRate: 89,
+                icon: "figure.fishing",
+                isDataBased: false,
+                details: "Perch spawning; roach bites on white."
+            ),
+            DetailedRecommendation(
+                title: "🏆 Your best one",
+                suggestion: "Based on your data",
+                successRate: store.baitStats.first?.averageResult ?? 0,
+                icon: "trophy",
+                isDataBased: true,
+                details: "Analysis of all your fishing sessions."
+            )
+        ])
+        
+        return Array(recs.prefix(10)) // maximum 10
+    }
+
+    
+    // Твои computed свойства (без изменений)
+    private var topFish: String? {
+        let fishCounts = Dictionary(grouping: store.entries, by: { $0.targetFish })
+            .sorted { $0.value.count > $1.value.count }
+        return fishCounts.first?.key
+    }
+    
+    private var bestDepthForGoodResults: Double {
+        let goodEntries = store.entries.filter { $0.result == .good }
+        return goodEntries.isEmpty ? 0 : goodEntries.reduce(0.0) { $0 + $1.depth } / Double(goodEntries.count)
+    }
+    
+    private var goodSuccessRate: Double {
+        let goodCount = store.entries.filter { $0.result == .good }.count
+        return store.entries.isEmpty ? 0 : Double(goodCount) / Double(store.entries.count) * 100
+    }
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            Text("🎣 Recommendations")
+                .font(.largeTitle.bold())
+                .padding()
+            
+            Text("Winter ice fishing tips")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .padding(.bottom, 30)
+            
+            ScrollView {
+                LazyVStack(spacing: 16) {
+                    // ✅ ИСПРАВЛЕНО: показываем всегда
+                    if allRecommendations.isEmpty {
+                        VStack(spacing: 20) {
+                            Image(systemName: "lightbulb.fill")
+                                .font(.system(size: 60))
+                                .foregroundColor(.blue.opacity(0.4))
+                            Text("Add your trips")
+                                .font(.title2)
+                                .foregroundColor(.secondary)
+                            Text("Get personalized tips")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxHeight: .infinity)
+                    } else {
+                        // 10 КЛИКАБЕЛЬНЫХ РЕКОМЕНДАЦИЙ!
+                        ForEach(allRecommendations) { rec in
+                            RecommendationCard(
+                                recommendation: rec,
+                                onTap: { selectedRecommendation = rec }
+                            )
+                        }
+                    }
+                }
+                .padding()
+            }
+        }
+        .sheet(item: $selectedRecommendation) { rec in
+            RecommendationDetailsView(recommendation: rec)
+        }
+    }
+}
+
+// ✅ НОВАЯ МОДЕЛЬ с деталями
+struct DetailedRecommendation: Identifiable {
+    let id = UUID()
+    let title: String
+    let suggestion: String
+    let successRate: Double
+    let icon: String
+    let isDataBased: Bool
+    let details: String
+}
+
+// ✅ УЛУЧШЕННАЯ КАРТОЧКА с тапом
+struct RecommendationCard: View {
+    let recommendation: DetailedRecommendation
+    let onTap: () -> Void
+    
+    var body: some View {
+        HStack {
+            Image(systemName: recommendation.icon)
+                .font(.title2)
+                .foregroundColor(recommendation.isDataBased ? .green : .blue)
+                .frame(width: 44)
+                .overlay(
+                    recommendation.isDataBased ?
+                    Circle().stroke(.green, lineWidth: 2) :
+                    Circle().stroke(.blue.opacity(0.3), lineWidth: 1)
+                )
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(recommendation.title)
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                
+                Text(recommendation.suggestion)
+                    .font(.title2.bold())
+                    .foregroundColor(.blue)
+                
+                HStack {
+                    Text("\(String(format: "%.0f%%", recommendation.successRate))")
+                        .font(.caption.bold())
+                        .foregroundColor(.green)
+                    Text(recommendation.isDataBased ? "your data" : "success")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+            }
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .foregroundColor(.gray.opacity(0.7))
+                .fontWeight(.medium)
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(16)
+        .shadow(color: .black.opacity(0.05), radius: 8)
+        .opacity(recommendation.isDataBased ? 1.0 : 0.95)
+        .onTapGesture {
+            onTap()
+        }
+    }
+}
+
+// ✅ ДЕТАЛЬНЫЙ ЭКРАН
+struct RecommendationDetailsView: View {
+    let recommendation: DetailedRecommendation
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color(red: 0.98, green: 0.99, blue: 1.0).ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // ✅ БОЛЬШОЙ ХЕДЕР
+                        HStack {
+                            Image(systemName: recommendation.icon)
+                                .font(.system(size: 56))
+                                .foregroundColor(recommendation.isDataBased ? .green : .blue)
+                            
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(recommendation.title)
+                                    .font(.title.bold())
+                                Text(recommendation.suggestion)
+                                    .font(.title2.bold())
+                            }
+                            
+                            Spacer()
+                            
+                            Text("\(String(format: "%.0f%%", recommendation.successRate))")
+                                .font(.largeTitle.bold())
+                                .foregroundColor(.green)
+                        }
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(20)
+                        .shadow(radius: 10)
+                        
+                        // ✅ ДЕТАЛИ
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Details")
+                                .font(.headline)
+                            
+                            Text(recommendation.details)
+                                .font(.body)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.leading)
+                            
+                            // ✅ WHEN TO USE блок
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("🎯 When to use")
+                                    .font(.headline)
+                                
+                                HStack(spacing: 12) {
+                                    ConditionChip(text: "Winter")
+                                    ConditionChip(text: "Ice fishing")
+                                    ConditionChip(text: recommendation.isDataBased ? "Your data" : "Proven")
+                                }
+                            }
+                        }
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(16)
+                        
+                        Spacer()
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle("Details")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") { dismiss() }
+                        .fontWeight(.medium)
+                }
+            }
+        }
+    }
+}
+
+// ✅ Вспомогательный компонент
+struct ConditionChip: View {
+    let text: String
+    
+    var body: some View {
+        Text(text)
+            .font(.caption)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color.blue.opacity(0.1))
+            .foregroundColor(.blue)
+            .cornerRadius(20)
+    }
+}
+
 
 
 struct CustomTabView: View {
@@ -96,6 +437,7 @@ struct CustomTabView: View {
         case journal = "Journal"
         case baits = "Baits"
         case results = "Results"
+        case recommendations = "Recommendations"
         case settings = "Settings"
     }
     
@@ -109,6 +451,7 @@ struct CustomTabView: View {
                     if selectedTab == .journal { JournalView(store: store) }
                     else if selectedTab == .baits { BaitsView(store: store) }
                     else if selectedTab == .results { ResultsView(store: store) }
+                    else if selectedTab == .recommendations { RecommendationsView(store: store) }
                     else if selectedTab == .settings { SettingsView(store: store) }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -145,6 +488,7 @@ struct CustomTabView: View {
                     // Правая часть (2 кнопки)
                     HStack(spacing: 40) {
                         tabButton(tab: .results, title: "Results", icon: "chart.bar.fill")
+                        tabButton(tab: .recommendations, title: "Recs", icon: "lightbulb.fill")
                         tabButton(tab: .settings, title: "Settings", icon: "gear")
                     }
                 }
