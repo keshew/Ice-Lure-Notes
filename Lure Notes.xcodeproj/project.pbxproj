@@ -39,6 +39,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8605CACE2F30AFCB00C3E152 /* Lure Notes.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Lure Notes.entitlements"; sourceTree = "<group>"; };
 		86DF1FBA2F2A2B1E00802147 /* Lure-Notes-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Lure-Notes-Info.plist"; sourceTree = "<group>"; };
 		86DF1FBF2F2A2D5E00802147 /* NotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		86F525422F167C5D004B562A /* Lure Notes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Lure Notes.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -102,6 +103,7 @@
 		86F525392F167C5D004B562A = {
 			isa = PBXGroup;
 			children = (
+				8605CACE2F30AFCB00C3E152 /* Lure Notes.entitlements */,
 				86DF1FBA2F2A2B1E00802147 /* Lure-Notes-Info.plist */,
 				86F525442F167C5D004B562A /* Ice Lure Notes */,
 				86DF1FC02F2A2D5E00802147 /* NotificationService */,
@@ -275,7 +277,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.app.icelurenotess.NotificationService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -305,7 +307,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.app.icelurenotess.NotificationService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -441,6 +443,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Lure Notes.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Ice Lure Notes/Preview Content\"";
@@ -448,6 +451,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Lure-Notes-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Lure Notes";
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app requires access to the camera to take photos and record videos.";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "We collect usage data to enhance app performance, improve features, and provide a better user experience. Your information remains secure and is not shared with third parties for advertising purposes.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -458,7 +463,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.app.icelurenotess;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -476,6 +481,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Lure Notes.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Ice Lure Notes/Preview Content\"";
@@ -483,6 +489,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Lure-Notes-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Lure Notes";
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app requires access to the camera to take photos and record videos.";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "We collect usage data to enhance app performance, improve features, and provide a better user experience. Your information remains secure and is not shared with third parties for advertising purposes.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -493,7 +501,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.app.icelurenotess;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
